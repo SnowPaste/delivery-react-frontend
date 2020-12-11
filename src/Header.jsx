@@ -22,6 +22,7 @@ export default class Header extends React.Component {
           
         </Nav>
         <Nav className="ml-auto">
+          <Nav.Link href={`/customer/${this.state.customer_id}/profile`}>My Profile</Nav.Link>
           <Nav.Link href={`/customer/${this.state.customer_id}/cart`}>Cart</Nav.Link>
         </Nav>
       </Navbar>

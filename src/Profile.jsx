@@ -8,6 +8,9 @@ import Col from 'react-bootstrap/Col'
 import ListGroup from 'react-bootstrap/ListGroup'
 import Tab from 'react-bootstrap/Tab'
 import Button from 'react-bootstrap/Button'
+import Card from 'react-bootstrap/Card'
+import ListGroupItem from 'react-bootstrap/ListGroupItem'
+import AccountForm from './AccountForm'
 
 export default class Profile extends React.Component {
   constructor(props) {
@@ -52,6 +55,16 @@ export default class Profile extends React.Component {
     } else {
       document.getElementById("password").innerHTML = "********";
     }
+  }
+
+  deleteCard(id) {
+    Axios.delete(config.host + '/customer/' + this.state.customer_id + '/delete_card/' + id)
+      .then(response => {
+        console.log(response.data)
+      })
+      .catch (error => {
+        console.log(error)
+      })
   }
 
   render() {
@@ -127,18 +140,70 @@ export default class Profile extends React.Component {
                   </Row>
                   </div>
                 </Tab.Pane>
+
                 <Tab.Pane eventKey="#address">
+                  <br/>
                   <h2>My Address</h2>
+                  <br/>
+                  <Row>
+                  {
+                    this.state.addresses.map((address, index) => {
+                      return (
+                        <Card style={{ width: '18rem', margin: '5px' }}>
+                          <Card.Body>
+                            <Card.Title>Address {index + 1}</Card.Title><br/>
+                            <Card.Text>
+                              <p>Address 1: {address.address1}</p>
+                              <p>Address 2: {address.address2}</p>
+                              <p>City: {address.city}</p>
+                              <p>State: {address.state}</p>
+                              <p>Zip: {address.zip}</p>
+                            </Card.Text>
+                            <Card.Link href="#">Edit Address</Card.Link>
+                            <Card.Link href="#">Delete Address</Card.Link>
+                          </Card.Body>
+                        </Card>
+                      )
+                    })
+                  }
+                  
+                  </Row>
                 </Tab.Pane>
+
                 <Tab.Pane eventKey="#cards">
+                  <br/>
                   <h2>My Credit Cards</h2>
+                  <br/>
+                  <Row>
+                  {
+                    this.state.creditCards.map((card, index) => {
+                      return (
+                        <Card style={{ width: '18rem', margin: '5px' }}>
+                          <Card.Body>
+                            <Card.Title>Card {index + 1}</Card.Title><br/>
+                            <Card.Text>
+                              <p>Card Number: {card.cardNumber}</p>
+                              <p>First Name: {card.firstName}</p>
+                              <p>Last Name: {card.lastName}</p>
+                              <p>Exp Date: {card.expDate.year}-{card.expDate.month}</p>
+                            </Card.Text>
+                            <Card.Link href="#">Edit Card</Card.Link>
+                            <Card.Link href="#">Delete Card</Card.Link>
+                          </Card.Body>
+                        </Card>
+                      )
+                    })
+                  }
+                  
+                  </Row>
                 </Tab.Pane>
               </Tab.Content>
             </Col>
           </Row>
         </Tab.Container>
 
-        
+<br/>
+        {/* <AccountForm /> */}
       </Container>
       </>
     )
