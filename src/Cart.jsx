@@ -130,7 +130,7 @@ export default class Cart extends React.Component {
               return (
                 <ListGroupItem key={item.id}>
                 <Row>
-                  <Col style={{padding: "10px", textAlign: "center"}} sm={1}><FontAwesomeIcon className="icon" icon={faMinusCircle} size="lg" value={item} onClick={() => this.deleteItem(item)} /></Col>
+                  <Col style={{padding: "10px", textAlign: "center"}} sm={1}><FontAwesomeIcon className="delete-icon" icon={faMinusCircle} size="lg" value={item} onClick={() => this.deleteItem(item)} /></Col>
                   <Col style={{paddingTop: "5px"}} sm={11}><h3>{item.name} x1</h3></Col>
                 </Row>
                 </ListGroupItem>

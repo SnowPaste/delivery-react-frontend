@@ -11,6 +11,12 @@ import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import ListGroupItem from 'react-bootstrap/ListGroupItem'
 import AccountForm from './AccountForm'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faPlus} from '@fortawesome/free-solid-svg-icons'
+import { faEdit } from '@fortawesome/free-solid-svg-icons'
+import Modal from 'react-bootstrap/Modal'
+import { FormControl } from 'react-bootstrap'
+
 
 export default class Profile extends React.Component {
   constructor(props) {
@@ -18,15 +24,18 @@ export default class Profile extends React.Component {
     this.state = {
       customer_id: this.props.match.params.customer_id,
       customer: null,
-      account: null,
+      accountName: null,
       addresses: [],
       creditCards: [],
       email: null,
-      firstname: null,
-      lastname: null,
+      firstName: null,
+      lastName: null,
       orderHistory: [],
       password: null,
-      phoneNumber: null
+      phoneNumber: null,
+      cart: null,
+      show: false,
+      onEdit: null,
     }
   }
 
@@ -36,15 +45,16 @@ export default class Profile extends React.Component {
         const customer = response.data;
         this.setState({
           customer: customer,
-          account: customer.accountName,
+          accountName: customer.accountName,
           addresses: customer.addressList,  
           creditCards: customer.creditCards,
           email: customer.email,
-          firstname: customer.firstName,
-          lastname: customer.lastName,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
           orderHistory: customer.orderHistory,
           password: customer.password,
-          phoneNumber: customer.phoneNumber
+          phoneNumber: customer.phoneNumber,
+          cart: customer.cart
         })
       })
   }
@@ -60,23 +70,91 @@ export default class Profile extends React.Component {
   deleteCard(id) {
     Axios.delete(config.host + '/customer/' + this.state.customer_id + '/delete_card/' + id)
       .then(response => {
-        console.log(response.data)
+        window.location.reload();
       })
       .catch (error => {
         console.log(error)
       })
   }
 
+  deleteAddress(id) {
+    Axios.delete(config.host + '/customer/' + this.state.customer_id + '/delete_address/' + id)
+      .then(response => {
+        window.location.reload();
+      })
+      .catch (error => {
+        console.log(error)
+      })
+  }
+
+  handleAccountUpdate(event) {
+    if (this.validateEmail(this.state.email) && this.validateString(this.state.firstName) && this.validateString(this.state.lastName) && this.validatePhone(this.state.phoneNumber)) {
+      Axios.put(config.host + "/customer/" + this.state.customer_id + "/update_customer",
+      {
+        accountName: this.state.accountName,
+        password: this.state.password,
+        addressList: this.state.addresses,
+        cart: this.state.cart,
+        creditCards: this.state.creditCards,
+        email: this.state.email,
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        orderHistory: this.state.orderHistory,
+        phoneNumber: this.state.phoneNumber
+      })
+      .then(response => {
+        window.location.reload();
+      })
+      .catch (error => {
+        console.log(error)
+      })
+    }
+  }
+
+  validateEmail(email) {
+    if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)) {
+      return true;
+    }
+    alert("You have entered an invalid email address!");
+    window.location.reload();
+    return false;
+  }
+
+  validateString(string) {
+    if (/^[A-Za-z_]+$/.test(string)) {
+      return true;
+    }
+    alert("You have entered an invalid name! Only letters and underscores are allowed");
+    return false;
+  }
+
+  validatePhone(number) {
+    if (/^\d{10}$/.test(number)) {
+      return true;
+    }
+    alert("You have entered an invalid phone number!");
+    window.location.reload();
+    return false;
+  }
+
+  handleAccountChange(event) {
+    this.setState({
+      [this.state.onEdit]: event.target.value
+    })
+  }
+
   render() {
+    console.log(this.state.orderDetails);
     return (
       <>
       <Header />
       <Container className="profile">
-        <h1 style={{textAlign: 'center'}}>Hi, {this.state.firstname}!</h1>
+        <h1 style={{textAlign: 'center'}}>Hi, {this.state.firstName}!</h1>
         <br/>
         <Tab.Container defaultActiveKey="#info">
           <Row>
             <Col sm={4}>
+              <br/>
               <ListGroup>
                 <ListGroup.Item action href="#info">
                   My Account
@@ -93,44 +171,53 @@ export default class Profile extends React.Component {
               <Tab.Content>
                 <Tab.Pane eventKey="#info">
                   <br/>
-                  <Row>
-                    <Col><h2>My Account</h2></Col>
-                    <Col><Button>Edit</Button></Col>
-                  </Row>
-                  
+                  <h2>My Account</h2>
                   <hr/>
-                  <div>
                   <Row>
                     <Col>
-                      <h5>Account Name: </h5>
-                      <p>{this.state.account}</p>
+                      <h5>Account Name: 
+                        <FontAwesomeIcon className="plus-icon" icon={faEdit} size="sm" onClick={()=> this.setState({show: true, onEdit: "accountName"})}/>
+                      </h5>
+                      <p>{this.state.accountName}</p>
                     </Col>
                     <Col>
-                      <h5>Phone Number: </h5>
+                      <h5>Phone Number: 
+                        <FontAwesomeIcon className="plus-icon" icon={faEdit} size="sm" onClick={()=> this.setState({show: true, onEdit: "phoneNumber"})}/>
+                      </h5>
                       <p>{this.state.phoneNumber}</p>
                     </Col>
                   </Row>
                   <br/>
                   <Row>
                     <Col>
-                      <h5>First Name: </h5>
-                      <p>{this.state.firstname}</p>
+                      <h5>First Name: 
+                        <FontAwesomeIcon className="plus-icon" icon={faEdit} size="sm" onClick={()=> this.setState({show: true, onEdit: "firstName"})}/>
+                      </h5>
+                      <p>{this.state.firstName}</p>
                     </Col>
                     <Col>
-                      <h5>Last Name: </h5>
-                      <p>{this.state.lastname}</p>
+                      <h5>Last Name: 
+                        <FontAwesomeIcon className="plus-icon" icon={faEdit} size="sm" onClick={()=> this.setState({show: true, onEdit: "lastName"})}/>
+                      </h5>
+                      <p>{this.state.lastName}</p>
                     </Col>
                   </Row>
                   <br/>
                   <Row>
                     <Col>
-                      <h5>Email: </h5>
+                      <h5>Email: 
+                        <FontAwesomeIcon className="plus-icon" icon={faEdit} size="sm" onClick={()=> this.setState({show: true, onEdit: "email"})}/>
+                      </h5>
                       <p>{this.state.email}</p>
                     </Col>
                     <Col>
                       <Row>
-                        <Col sm={4}><h5>Password: </h5></Col>
-                        <Col sm={8}>
+                        <Col sm={5}>
+                          <h5>Password: 
+                          <FontAwesomeIcon className="plus-icon" icon={faEdit} size="sm" onClick={()=> this.setState({show: true, onEdit: "password"})}/>
+                          </h5>
+                        </Col>
+                        <Col sm={7}>
                         <input type="checkbox" id="hide" onClick={(event) => this.showPassword(event)}/>{' '}
                         <label htmlFor="hide">Show Password</label>
                         </Col>
@@ -138,7 +225,6 @@ export default class Profile extends React.Component {
                       <p id="password">********</p>
                     </Col>
                   </Row>
-                  </div>
                 </Tab.Pane>
 
                 <Tab.Pane eventKey="#address">
@@ -149,24 +235,28 @@ export default class Profile extends React.Component {
                   {
                     this.state.addresses.map((address, index) => {
                       return (
-                        <Card style={{ width: '18rem', margin: '5px' }}>
-                          <Card.Body>
-                            <Card.Title>Address {index + 1}</Card.Title><br/>
-                            <Card.Text>
-                              <p>Address 1: {address.address1}</p>
-                              <p>Address 2: {address.address2}</p>
-                              <p>City: {address.city}</p>
-                              <p>State: {address.state}</p>
-                              <p>Zip: {address.zip}</p>
-                            </Card.Text>
-                            <Card.Link href="#">Edit Address</Card.Link>
-                            <Card.Link href="#">Delete Address</Card.Link>
+                        <Card border="info" key={index} style={{ width: '16rem', margin: '2px' }}>
+                          <Card.Header as="h4">Address {index + 1}</Card.Header>
+                          <ListGroup className="list-group-flush">
+                            <ListGroupItem>Address 1: {address.address1}</ListGroupItem>
+                            <ListGroupItem>Address 2: {address.address2}</ListGroupItem>
+                            <ListGroupItem>City: {address.city}</ListGroupItem>
+                            <ListGroupItem>State: {address.state}</ListGroupItem>
+                            <ListGroupItem>Zip: {address.zip}</ListGroupItem>
+                          </ListGroup>
+                          <Card.Body>  
+                          <Button style={{marginRight: "5px"}}>Edit</Button>{' '}
+                          <Button variant="danger" onClick={() => this.deleteAddress(address.id)}>Delete</Button>
                           </Card.Body>
                         </Card>
                       )
                     })
                   }
-                  
+                  <Card border="info" style={{ width: '16rem', margin: '2px', minHeight: '21rem' }}>
+                    <Card.Body style={{textAlign: 'center', paddingTop: "55%"}}>
+                    <FontAwesomeIcon className="plus-icon" icon={faPlus} size="2x"/>
+                    </Card.Body>
+                  </Card>
                   </Row>
                 </Tab.Pane>
 
@@ -178,23 +268,28 @@ export default class Profile extends React.Component {
                   {
                     this.state.creditCards.map((card, index) => {
                       return (
-                        <Card style={{ width: '18rem', margin: '5px' }}>
-                          <Card.Body>
-                            <Card.Title>Card {index + 1}</Card.Title><br/>
-                            <Card.Text>
-                              <p>Card Number: {card.cardNumber}</p>
-                              <p>First Name: {card.firstName}</p>
-                              <p>Last Name: {card.lastName}</p>
-                              <p>Exp Date: {card.expDate.year}-{card.expDate.month}</p>
-                            </Card.Text>
-                            <Card.Link href="#">Edit Card</Card.Link>
-                            <Card.Link href="#">Delete Card</Card.Link>
+                        <Card border="info" key={index} style={{ width: '16rem', margin: '2px' }}>
+                          <Card.Header as="h4">Credit Card {index + 1}</Card.Header>
+                          
+                            <ListGroup className="list-group-flush">
+                              <ListGroupItem>Card Number: {card.cardNumber}</ListGroupItem>
+                              <ListGroupItem>First Name: {card.firstName}</ListGroupItem>
+                              <ListGroupItem>Last Name: {card.lastName}</ListGroupItem>
+                              <ListGroupItem>Exp Date: {card.expDate}</ListGroupItem> 
+                            </ListGroup>
+                          <Card.Body>    
+                            <Button style={{marginRight: "5px"}}>Edit</Button>{' '}
+                            <Button variant="danger" onClick={() => this.deleteCard(card.id)}>Delete</Button>
                           </Card.Body>
                         </Card>
                       )
                     })
                   }
-                  
+                  <Card border="info" style={{ width: '16rem', margin: '2px', minHeight: '21rem' }}>
+                    <Card.Body style={{textAlign: 'center', paddingTop: "55%"}}>
+                    <FontAwesomeIcon className="plus-icon" icon={faPlus} size="2x"/>
+                    </Card.Body>
+                  </Card>
                   </Row>
                 </Tab.Pane>
               </Tab.Content>
@@ -203,7 +298,18 @@ export default class Profile extends React.Component {
         </Tab.Container>
 
 <br/>
-        {/* <AccountForm /> */}
+        {/* <AccountForm func="update" id={this.state.customer_id} /> */}
+        <Modal show={this.state.show} onHide={() => this.setState({show: false, onEdit: null})}>
+        <Modal.Header closeButton>
+          <Modal.Title>Update {this.state.onEdit}:</Modal.Title>
+        </Modal.Header>
+        <Modal.Body><FormControl onChange={(event) => {this.handleAccountChange(event)}} /></Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={() => this.handleAccountUpdate()}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
       </Container>
       </>
     )

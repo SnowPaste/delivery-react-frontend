@@ -4,7 +4,6 @@ import Home from './Home';
 import Restaurant from './Restaurant'
 import Cart from './Cart'
 import Order from './Order'
-import Landing from './Landing';
 import Profile from './Profile';
 
 export default class App extends React.Component {
@@ -18,7 +17,6 @@ export default class App extends React.Component {
                     <Route exact path="/restaurant/:restaurant_id" component={Restaurant}/>
                     <Route exact path="/customer/:customer_id/cart" component={Cart}/>
                     <Route exact path="/order/:order_id" component={Order}/>
-                    <Route exact path="/landing" component={Landing}/>
                     <Route exact path="/customer/:customer_id/profile" component={Profile}/>
                 </Switch>
             </Router>
