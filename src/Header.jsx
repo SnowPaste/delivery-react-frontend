@@ -25,8 +25,8 @@ export default class Header extends React.Component {
           
         </Nav>
         <Nav className="ml-auto">
-          <Nav.Link href={`/customer/${this.state.customer_id}/profile`}><FontAwesomeIcon icon={faUserCircle} size="md"/> My Profile</Nav.Link>
-          <Nav.Link href={`/customer/${this.state.customer_id}/cart`}><FontAwesomeIcon icon={faShoppingCart} size="md"/> Cart</Nav.Link>
+          <Nav.Link href={`/customer/${this.state.customer_id}/profile`}><FontAwesomeIcon icon={faUserCircle} size="sm"/> My Profile</Nav.Link>
+          <Nav.Link href={`/customer/${this.state.customer_id}/cart`}><FontAwesomeIcon icon={faShoppingCart} size="sm"/> Cart</Nav.Link>
         </Nav>
       </Navbar>
       </>

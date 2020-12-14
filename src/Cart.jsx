@@ -2,6 +2,7 @@ import React from 'react'
 import Axios from 'axios'
 import Header from './Header'
 import './index.css'
+import config from './config'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
@@ -19,7 +20,6 @@ export default class Cart extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      host: "http://localhost:5000",
       customer_id: this.props.match.params.customer_id,
       cart: null,
       tip: 0,
@@ -30,7 +30,7 @@ export default class Cart extends React.Component {
   }
 
   componentDidMount () {
-    Axios.get(this.state.host + '/customer/' + this.state.customer_id + '/get_cart')
+    Axios.get(config.host + '/customer/' + this.state.customer_id + '/get_cart')
       .then(response => {
         let cart = response.data;
         let raw = 0;
@@ -49,7 +49,7 @@ export default class Cart extends React.Component {
   }
 
   deleteItem (item) {
-    Axios.put(this.state.host + '/customer/' + this.state.customer_id + '/remove_dish/' + item.id)
+    Axios.put(config.host + '/customer/' + this.state.customer_id + '/remove_dish/' + item.id)
       .then (response => {
         window.location.reload();
       })
@@ -59,7 +59,7 @@ export default class Cart extends React.Component {
   }
 
   emptyCart () {
-    Axios.put(this.state.host + '/customer/' + this.state.customer_id + '/empty_cart')
+    Axios.put(config.host + '/customer/' + this.state.customer_id + '/empty_cart')
       .then(response => {
         window.location.reload()
       })
@@ -69,7 +69,7 @@ export default class Cart extends React.Component {
   }
 
   setTip (amount) {
-    Axios.put(this.state.host + '/customer/' + this.state.customer_id + '/set_tip', {tip: amount})
+    Axios.put(config.host + '/customer/' + this.state.customer_id + '/set_tip', {tip: amount})
       .then(response => {
         window.location.reload()
       })
@@ -102,7 +102,7 @@ export default class Cart extends React.Component {
       alert("Your cart is still empty!");
     } else {
       const restaurant_id = this.state.cart.items[0].restaurantId;
-      Axios.post(this.state.host + '/customer/' + this.state.customer_id + '/make_order/' + restaurant_id)
+      Axios.post(config.host + '/customer/' + this.state.customer_id + '/make_order/' + restaurant_id)
         .then(response => {
           const order_id = response.data.id;
           this.props.history.push('/order/' + order_id);

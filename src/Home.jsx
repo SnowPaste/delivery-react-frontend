@@ -7,21 +7,21 @@ import ListGroup from 'react-bootstrap/ListGroup'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Rating from 'react-rating'
+import config from './config'
 
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      host: "http://localhost:5000",
       restaurants: []
     }
   }
   
   componentDidMount() {
-    Axios.get(this.state.host + '/restaurants')
-      .then(res => {
+    Axios.get(config.host + '/restaurants')
+      .then(response => {
         this.setState({
-          restaurants: res.data
+          restaurants: response.data
         })
       })
       .catch (error => {

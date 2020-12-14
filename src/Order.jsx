@@ -35,7 +35,7 @@ export default class Order extends React.Component {
         const order = response.data;
         this.setState({
           order: order,
-          createTime: order.createTime,
+          createTime: order.createTime.hour + ":" + order.createTime.minute,
           restaurant: order.restaurant.name,
           driver: order.driver.firstName + " " + order.driver.lastName,
           driver_phone: order.driver.phoneNumber,
@@ -72,6 +72,7 @@ export default class Order extends React.Component {
         <ListGroup>
           <ListGroup.Item><h3>Status: {this.state.status}</h3></ListGroup.Item>
           <ListGroup.Item><h5>Restaurant: {this.state.restaurant}</h5></ListGroup.Item>
+          <ListGroup.Item><h5>Order Create: {this.state.createTime}</h5></ListGroup.Item>
           <ListGroup.Item><h5>Estimated Deliver: {this.state.est}</h5></ListGroup.Item>
           <ListGroup.Item><h5>Deliver Time: {this.state.deliver}</h5></ListGroup.Item>
           <ListGroup.Item><h5>Your Driver: {this.state.driver} <FontAwesomeIcon className="plus-icon" icon={faInfoCircle} size="sm" onClick={(event)=> this.handleClick(event)}/></h5></ListGroup.Item>

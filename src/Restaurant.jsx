@@ -2,6 +2,7 @@ import Axios from 'axios'
 import React from 'react'
 import Header from './Header'
 import './index.css'
+import config from './config'
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
@@ -16,18 +17,18 @@ export default class Restaurant extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      host: "http://localhost:5000",
       restaurant: null,
       menu: [],
       error: null,
-      name: ""
+      name: "",
+      success: null,
     }
   }
 
   componentDidMount() {
     const restaurant_id = this.props.match.params.restaurant_id;
     if (restaurant_id !== undefined) {
-      Axios.get(this.state.host + '/restaurant/' + restaurant_id)
+      Axios.get(config.host + '/restaurant/' + restaurant_id)
         .then(response => {
           const restaurant = response.data;
           this.setState({
@@ -43,26 +44,32 @@ export default class Restaurant extends React.Component {
   }
 
   addToCart(item) {
-    Axios.put(this.state.host + '/customer/5f9fc4461ec87e4d750e958c/add_dish/' + item.id)
+    this.setState({
+      success: null,
+      error: null
+    })
+    Axios.put(config.host + '/customer/5f9fc4461ec87e4d750e958c/add_dish/' + item.id)
       .then(response => {
         if (typeof(response.data) === 'string') {
           this.setState({error: response.data})
+        } else {
+          this.setState({success: true})
         }
       })
       .catch (error => {
         console.log(error)
       })
   }
-
  
   render() {
     return (
-    <>
+    <> 
       <Header/>
       <Container>
         <h1 style={{textAlign: "center"}}>{this.state.name}</h1>
         <hr/>
         <Alert variant="danger" style={this.state.error === null ? {display: "none"} : {display: "block"}}>{this.state.error}</Alert>
+        <Alert variant="success" style={this.state.success === null ? {display: "none"} : {display: "block"}}>Added to cart!</Alert>
         <br/>
         <ListGroup style={{width: "70vw", paddingLeft: "5vw"}}>
         {
