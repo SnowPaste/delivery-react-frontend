@@ -14,6 +14,7 @@ import ButtonToolbar from 'react-bootstrap/ButtonToolbar'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
+import Form from 'react-bootstrap/Form'
 import { faMinusCircle } from '@fortawesome/free-solid-svg-icons'
 
 export default class Cart extends React.Component {
@@ -25,7 +26,12 @@ export default class Cart extends React.Component {
       tip: 0,
       total: 0,
       items: [],
-      rawTotal: 0
+      rawTotal: 0,
+      address1: null,
+      address2: null,
+      city: null,
+      state: null,
+      zip: null
     }
   }
 
@@ -82,27 +88,40 @@ export default class Cart extends React.Component {
     this.setTip(parseFloat(amount).toFixed(2))
   }
 
-  handleChange (event) {
-    const tip = event.target.value !== "" ? parseFloat(event.target.value).toFixed(2) : event.target.value;
-    if (isNaN(tip)) {
-      alert("Please input a valid number of tip!")
+  handleChange (key, event) {
+    if (key === 'tip') {
+      const tip = event.target.value !== "" ? parseFloat(event.target.value).toFixed(2) : event.target.value;
+      if (isNaN(tip)) {
+        alert("Please input a valid number of tip!")
+      } else {
+        this.setState({
+          tip: tip
+        })
+      }
     } else {
       this.setState({
-        tip: tip
+        [key]: event.target.value
       })
     }
+    
   }
 
   handleApply () {
     this.setTip(this.state.tip)
   }
 
-  placeOrder () {
+  placeOrder (event) {
     if (this.state.cart.items.length === 0) {
       alert("Your cart is still empty!");
     } else {
       const restaurant_id = this.state.cart.items[0].restaurantId;
-      Axios.post(config.host + '/customer/' + this.state.customer_id + '/make_order/' + restaurant_id)
+      Axios.post(config.host + '/customer/' + this.state.customer_id + '/make_order/' + restaurant_id, {
+        address1: this.state.address1,
+        address2: this.state.address2,
+        city: this.state.city,
+        state: this.state.state,
+        zip: this.state.zip
+      })
         .then(response => {
           const order_id = response.data.id;
           this.props.history.push('/order/' + order_id);
@@ -158,7 +177,7 @@ export default class Cart extends React.Component {
                   <FormControl
                     type="text"
                     placeholder="Tip Amount"
-                    onChange={event => this.handleChange(event)}
+                    onChange={event => this.handleChange('tip', event)}
                   />
                 </InputGroup>
                 <Button style={{marginLeft: "5px"}} onClick={() => this.handleApply()}>Apply</Button>
@@ -170,7 +189,60 @@ export default class Cart extends React.Component {
           <hr/>
           <h3>Total: ${this.state.total}</h3>
           <br/>
-          <Button onClick={() => this.placeOrder()}>Place Order!</Button>
+          <Form>
+            <h3>Enter your address:</h3>
+              <Row>
+                <Col>
+                  <InputGroup className="mb-3">
+                    <InputGroup.Prepend>
+                      <InputGroup.Text id="basic-addon1">Address 1:</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <FormControl id="address1" type="text" onChange={event => this.handleChange('address1', event)}/>
+                  </InputGroup>
+                </Col>
+                <Col>
+                  <InputGroup className="mb-3">
+                    <InputGroup.Prepend>
+                      <InputGroup.Text id="basic-addon1">Address 2:</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <FormControl id="address2" type="text" onChange={event => this.handleChange('address2', event)}/>
+                  </InputGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col>
+                <InputGroup className="mb-3">
+                  <InputGroup.Prepend>
+                    <InputGroup.Text id="basic-addon1">City: </InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <FormControl id="city" type="text" onChange={event => this.handleChange('city', event)}/>
+                </InputGroup>
+                </Col>
+                <Col>
+                <InputGroup className="mb-3">
+                  <InputGroup.Prepend>
+                    <InputGroup.Text id="basic-addon1">State: </InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <FormControl id="state" type="text" onChange={event => this.handleChange('state', event)}/>
+                </InputGroup>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col>
+                <InputGroup className="mb-3">
+                  <InputGroup.Prepend>
+                    <InputGroup.Text id="basic-addon1">Zip: </InputGroup.Text>
+                  </InputGroup.Prepend>
+                  <FormControl id="zip" type="text" onChange={event => this.handleChange('zip', event)}/>
+                </InputGroup>
+                </Col>
+                <Col></Col>
+              </Row>
+          </Form>
+          <br/>
+          <Button onClick={(event) => this.placeOrder(event)}>Place Order!</Button>
         </Container>
         
       </>

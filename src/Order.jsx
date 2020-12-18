@@ -26,13 +26,24 @@ export default class Order extends React.Component {
       driver_phone: null,
       driver_car: null,
       driver_licence: null,
+      address: null,
+      timer: null
     }
   }
 
   componentDidMount() {
+    this.getOrder();
+    this.timer = setInterval(() => this.getOrder(), 3000);
+  }
+
+  getOrder () {
+    if (this.state.status === "DELIVERED") {
+      clearInterval(this.timer);
+    }
     Axios.get(config.host + "/order/get_an_order/" + this.state.order_id)
       .then(response => {
         const order = response.data;
+        let address = order.address.address1 + ", " + order.address.address2 + ", " + order.address.city + ", " + order.address.state + ", " + order.address.zip
         this.setState({
           order: order,
           createTime: order.createTime.hour + ":" + order.createTime.minute,
@@ -43,6 +54,7 @@ export default class Order extends React.Component {
           driver_licence: order.driver.carLicence,
           est: order.estDeliverTime.hour + ":" + order.estDeliverTime.minute,
           status: order.status,
+          address: address
         })
         if (order.deliverTime !== null) {
           this.setState({
@@ -60,9 +72,7 @@ export default class Order extends React.Component {
   }
 
   render() {
-    if (this.state.status !== "DELIVERED") {
-          document.head.insertAdjacentHTML( 'beforeEnd', '<meta httpEquiv="refresh content="10" />' );
-        }
+    
     return (
       <>
       <Header />
@@ -72,6 +82,7 @@ export default class Order extends React.Component {
         <ListGroup>
           <ListGroup.Item><h3>Status: {this.state.status}</h3></ListGroup.Item>
           <ListGroup.Item><h5>Restaurant: {this.state.restaurant}</h5></ListGroup.Item>
+          <ListGroup.Item><h5>Address: {this.state.address}</h5></ListGroup.Item>
           <ListGroup.Item><h5>Order Create: {this.state.createTime}</h5></ListGroup.Item>
           <ListGroup.Item><h5>Estimated Deliver: {this.state.est}</h5></ListGroup.Item>
           <ListGroup.Item><h5>Deliver Time: {this.state.deliver}</h5></ListGroup.Item>
