@@ -10,7 +10,7 @@ import Tab from 'react-bootstrap/Tab'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
 import ListGroupItem from 'react-bootstrap/ListGroupItem'
-import AccountForm from './AccountForm'
+import AddressForm from './AddressForm'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faPlus} from '@fortawesome/free-solid-svg-icons'
 import { faEdit } from '@fortawesome/free-solid-svg-icons'
@@ -36,6 +36,10 @@ export default class Profile extends React.Component {
       cart: null,
       show: false,
       onEdit: null,
+      onEditCard: null,
+      showCard: false,
+      onEditAddress: null,
+      showAddress: false
     }
   }
 
@@ -144,7 +148,6 @@ export default class Profile extends React.Component {
   }
 
   render() {
-    console.log(this.state.orderDetails);
     return (
       <>
       <Header />
@@ -245,7 +248,7 @@ export default class Profile extends React.Component {
                             <ListGroupItem>Zip: {address.zip}</ListGroupItem>
                           </ListGroup>
                           <Card.Body>  
-                          <Button style={{marginRight: "5px"}}>Edit</Button>{' '}
+                          <Button style={{marginRight: "5px"}} onClick={() => this.setState({showAddress: true, onEditAddress: address.id})}>Edit</Button>{' '}
                           <Button variant="danger" onClick={() => this.deleteAddress(address.id)}>Delete</Button>
                           </Card.Body>
                         </Card>
@@ -254,7 +257,7 @@ export default class Profile extends React.Component {
                   }
                   <Card border="info" style={{ width: '16rem', margin: '2px', minHeight: '21rem' }}>
                     <Card.Body style={{textAlign: 'center', paddingTop: "55%"}}>
-                    <FontAwesomeIcon className="plus-icon" icon={faPlus} size="2x"/>
+                    <FontAwesomeIcon className="plus-icon" icon={faPlus} size="2x" onClick={() => this.setState({showAddress: true})}/>
                     </Card.Body>
                   </Card>
                   </Row>
@@ -297,9 +300,8 @@ export default class Profile extends React.Component {
           </Row>
         </Tab.Container>
 
-<br/>
         {/* <AccountForm func="update" id={this.state.customer_id} /> */}
-        <Modal show={this.state.show} onHide={() => this.setState({show: false, onEdit: null})}>
+      <Modal show={this.state.show} onHide={() => this.setState({show: false, onEdit: null})}>
         <Modal.Header closeButton>
           <Modal.Title>Update {this.state.onEdit}:</Modal.Title>
         </Modal.Header>
@@ -310,6 +312,16 @@ export default class Profile extends React.Component {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <Modal show={this.state.showAddress} onHide={() => this.setState({showAddress: false, onEditAddress: null})}>
+        <Modal.Header closeButton>
+          <Modal.Title>Update Address:</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <AddressForm func={this.state.onEditAddress === null ? "add" : "update"} customer_id={this.state.customer_id} address_id={this.state.onEditAddress} />
+        </Modal.Body>
+      </Modal>
+
       </Container>
       </>
     )
